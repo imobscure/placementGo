@@ -22,13 +22,42 @@ class HomeView(APIView):
 
         token = request.COOKIES.get('jwt')
         if not token :
-            raise AuthenticationFailed('Unauthenticated!')
+            return redirect('register')
         try:
             payload = jwt.decode(token, 'lFOPP9ja00OfHYF0Vv7MV_Q2nkOx6HqVvZOrhV71U9tYa4MCrq_qZn0UvXn0pbxj', algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
-            raise AuthenticationFailed('Unauthenticated!')
+            return redirect('register')
         user = User.objects.filter(id=payload['id']).first()
         usr = UserSerializer(user)
-        
+
         data = serializer.data
         return Response({'data': data, 'user': usr.data})
+
+
+class ProfileView(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'dsa/profile.html'
+
+    def get(self, request):
+        dsa = Dsa.objects.all()
+        serializer = DsaSerializer(dsa, many=True)
+
+        token = request.COOKIES.get('jwt')
+        if not token :
+            return redirect('register')
+        try:
+            payload = jwt.decode(token, 'lFOPP9ja00OfHYF0Vv7MV_Q2nkOx6HqVvZOrhV71U9tYa4MCrq_qZn0UvXn0pbxj', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            return redirect('register')
+        user = User.objects.filter(id=payload['id']).first()
+        usr = UserSerializer(user)
+        Data = serializer.data
+
+        personal = []
+        for data in Data:
+            if data['name'] == 'Watermelon':
+                personal.append(data)
+
+        print(personal)
+        print(Data)
+        return Response({'data': personal, 'user': usr.data})
