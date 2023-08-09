@@ -35,7 +35,7 @@ class LoginView(APIView):
         email = request.data['email']
         password = request.data['password']
         user = User.objects.filter(email=email).first()
-        print(user.username)
+        #print(user.username)
         if user is None:
             return render(request, 'authapi/register.html', {'Lerror': 'User not found!'})
 
@@ -56,7 +56,6 @@ class LoginView(APIView):
         response.data = {
             'jwt': token
         }
-        print(token)
         return response
 
 
@@ -86,4 +85,4 @@ class LogoutView(APIView):
         response.data = {
             'message': 'success'
         }
-        return response
+        return redirect('register')
